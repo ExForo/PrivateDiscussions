@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="estPD" title="Esthetic Private Discussions" version_string="1.1.2" version_id="1120" url="" install_callback_class="Esthetic_PD_Service_Manager" install_callback_method="install" uninstall_callback_class="Esthetic_PD_Service_Manager" uninstall_callback_method="uninstall">
+  <admin_navigation/>
+  <admin_permissions/>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="estPD_forum_node_edit"><![CDATA[<fieldset>
+    <dl class="ctrlUnit">
+        <dt>{xen:phrase estPD_admin_allow_estpd}:</dt>
+        <dd>
+            <ul>
+                <li>
+                    <label for="ctrl_estpd_allow_access_quoting_1"><input id="ctrl_estpd_allow_access_quoting_1" type="checkbox" name="estpd_allow_access_quoting" value="1" {xen:if '{$estpd_allow_access_quoting}', 'checked="checked" '}/> {xen:phrase estpd_admin_allow_thread_access_quoting}</label>
+                    <p class="hint">{xen:phrase estpd_admin_allow_thread_access_quoting_hint}</p>
+                </li>
+            </ul>
+        </dd>
+    </dl>
+    
+    <dl class="ctrlUnit">
+        <dt></dt>
+        <dd>
+            <ul>
+                <li>
+                    <label for="ctrl_allow_private_threads_1"><input id="ctrl_allow_private_threads_1" type="checkbox" name="estpd_allow_private_threads" value="1" {xen:if '{$estpd_allow_private_threads}', 'checked="checked" '}/> {xen:phrase estPD_admin_allow_estpd_label}</label>
+                    <p class="hint">{xen:phrase estPD_admin_allow_estpd_hint}</p>
+                </li>
+            </ul>
+        </dd>
+    </dl>
+</fieldset>]]></template>
+  </admin_templates>
+  <admin_template_modifications/>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="load_class_controller" execute_order="236800" callback_class="Esthetic_PD_Listener_Controller" callback_method="listen" active="1" hint="" description=""/>
+    <listener event_id="load_class_datawriter" execute_order="236800" callback_class="Esthetic_PD_Listener_DataWriter" callback_method="listen" active="1" hint="" description="DataWriter overwriting"/>
+    <listener event_id="load_class_model" execute_order="236800" callback_class="Esthetic_PD_Listener_Model" callback_method="listen" active="1" hint="" description=""/>
+    <listener event_id="load_class_view" execute_order="236800" callback_class="Esthetic_PD_Listener_View" callback_method="listen" active="1" hint="" description=""/>
+    <listener event_id="template_hook" execute_order="236800" callback_class="Esthetic_PD_Listener_Hooks" callback_method="listen" active="1" hint="" description=""/>
+    <listener event_id="template_post_render" execute_order="236800" callback_class="Esthetic_PD_Listener_Renders" callback_method="listen" active="1" hint="" description="Post-render listeners"/>
+  </code_event_listeners>
+  <cron/>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups>
+    <group group_id="estPD_options" display_order="2368" debug_only="0"/>
+    <option option_id="estPD_enabled" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="estPD_options" display_order="10"/>
+    </option>
+    <option option_id="estpd_allow_quoting" edit_format="radio" data_type="unsigned_integer" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params>0={xen:phrase estpd_thread_quoting_denied}
+1={xen:phrase estpd_thread_quoting_defined_by_node_settings}
+2={xen:phrase estpd_thread_quoting_allowed}</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="estPD_options" display_order="20"/>
+    </option>
+  </optiongroups>
+  <permissions>
+    <permission_groups/>
+    <permissions>
+      <permission permission_group_id="forum" permission_id="estpd_can_create" permission_type="flag" default_value="unset" interface_group_id="estpd" display_order="100"/>
+      <permission permission_group_id="forum" permission_id="estpd_can_manage" permission_type="flag" default_value="unset" interface_group_id="estpd" display_order="300"/>
+      <permission permission_group_id="forum" permission_id="estpd_can_set_limits" permission_type="flag" default_value="unset" interface_group_id="estpd" display_order="200"/>
+    </permissions>
+    <interface_groups>
+      <interface_group interface_group_id="estpd" display_order="236800"/>
+    </interface_groups>
+  </permissions>
+  <phrases>
+    <phrase title="estpd_access_limit_explain" version_id="1120" version_string="1.1.2"><![CDATA[Автором темы установлен ограниченный доступ к содержимому. Пожалуйста, свяжитесь с автором темы (<a class="username" href="{link}">{username}</a>), чтобы получить возможность просмотра содержимого.]]></phrase>
+    <phrase title="estpd_access_settings_ctrl" version_id="1120" version_string="1.1.2"><![CDATA[Установки доступа]]></phrase>
+    <phrase title="estPD_admin_allow_estpd" version_id="1120" version_string="1.1.2"><![CDATA[Приватная тема]]></phrase>
+    <phrase title="estPD_admin_allow_estpd_hint" version_id="1120" version_string="1.1.2"><![CDATA[Установите этот флаг, чтобы разрешить пользователям сайта создавать приватные темы.]]></phrase>
+    <phrase title="estPD_admin_allow_estpd_label" version_id="1120" version_string="1.1.2"><![CDATA[Разрешить приватные темы в этом узле]]></phrase>
+    <phrase title="estpd_admin_allow_thread_access_quoting" version_id="1120" version_string="1.1.2"><![CDATA[Разрешить ограничивать доступ к своим собственным темам в этом узле]]></phrase>
+    <phrase title="estpd_admin_allow_thread_access_quoting_hint" version_id="1120" version_string="1.1.2"><![CDATA[Если флаг установлен, пользователи получат возможность ограничивать доступ к своим собственным темам по таким параметрам, как количество сообщений, симпатий, количеству набранных баллов за достижения.]]></phrase>
+    <phrase title="estPD_allow_public_invitation" version_id="1120" version_string="1.1.2"><![CDATA[Разрешить добавлять новых участников]]></phrase>
+    <phrase title="estPD_allow_public_invitation_hint" version_id="1120" version_string="1.1.2"><![CDATA[Все участники темы будут иметь возможность добавлять новых участников к обсуждению.]]></phrase>
+    <phrase title="estpd_boolean_operation_and" version_id="1120" version_string="1.1.2"><![CDATA[И]]></phrase>
+    <phrase title="estpd_boolean_operation_or" version_id="1120" version_string="1.1.2"><![CDATA[ИЛИ]]></phrase>
+    <phrase title="estPD_confirm" version_id="1120" version_string="1.1.2"><![CDATA[Подтвердить]]></phrase>
+    <phrase title="estpd_days_on_forum" version_id="1120" version_string="1.1.2"><![CDATA[Дней на форуме]]></phrase>
+    <phrase title="estpd_error_invalid_rule" version_id="1120" version_string="1.1.2"><![CDATA[Описанное правило доступа к теме содержит ошибки и не может быть применено.]]></phrase>
+    <phrase title="estpd_error_limitation_rule_seems_to_be_not_effective" version_id="1120" version_string="1.1.2"><![CDATA[Описанное правило доступа к теме не может быть применено, так как не удается определить ситуации, в которых оно являлось бы эффективным.]]></phrase>
+    <phrase title="estpd_error_no_permissions_to_make_thread_limited" version_id="1120" version_string="1.1.2"><![CDATA[У вас недостаточно прав для того, чтобы устанавливать ограничения на доступ к теме в этом разделе.]]></phrase>
+    <phrase title="estpd_error_no_permissions_to_make_thread_private" version_id="1120" version_string="1.1.2"><![CDATA[У вас недостаточно прав, чтобы создавать приватные темы в этом разделе.]]></phrase>
+    <phrase title="estpd_error_wrong_syntax_in_rule" version_id="1120" version_string="1.1.2"><![CDATA[Ошибка синтаксиса при составлении правила ограничения доступа.]]></phrase>
+    <phrase title="estPD_form_collapse" version_id="1120" version_string="1.1.2"><![CDATA[Тема с ограниченным доступом (нажмите, чтобы свернуть)]]></phrase>
+    <phrase title="estPD_form_expand" version_id="1120" version_string="1.1.2"><![CDATA[Тема с ограниченным доступом (нажмите, чтобы развернуть)]]></phrase>
+    <phrase title="estpd_granted_for_users" version_id="1120" version_string="1.1.2"><![CDATA[Разрешено пользователям]]></phrase>
+    <phrase title="estpd_limitation_rule_syntax_error" version_id="1120" version_string="1.1.2"><![CDATA[Описанное правило содержит синтаксические ошибки и должно быть исправлено.]]></phrase>
+    <phrase title="estpd_limited_content_warning" version_id="1120" version_string="1.1.2"><![CDATA[[Доступ к данной теме ограничен автором]]]></phrase>
+    <phrase title="estpd_limited_thread_explain" version_id="1120" version_string="1.1.2"><![CDATA[Доступ к содержимому ограничен условиями, которым вы не соответствуете.]]></phrase>
+    <phrase title="estpd_limits_settings_ctrl" version_id="1120" version_string="1.1.2"><![CDATA[Установки доступа]]></phrase>
+    <phrase title="estpd_limit_days" version_id="1120" version_string="1.1.2"><![CDATA[Дней на форуме]]></phrase>
+    <phrase title="estpd_limit_extended_rules" version_id="1120" version_string="1.1.2"><![CDATA[Расширенные правила]]></phrase>
+    <phrase title="estpd_limit_likes" version_id="1120" version_string="1.1.2"><![CDATA[Количество симпатий]]></phrase>
+    <phrase title="estpd_limit_posts" version_id="1120" version_string="1.1.2"><![CDATA[Количество сообщений]]></phrase>
+    <phrase title="estpd_limit_trophies" version_id="1120" version_string="1.1.2"><![CDATA[Баллы за достижения]]></phrase>
+    <phrase title="estpd_member_of_groups" version_id="1120" version_string="1.1.2"><![CDATA[Участник групп]]></phrase>
+    <phrase title="estPD_personal_private_discussions" version_id="1120" version_string="1.1.2"><![CDATA[Приватные темы]]></phrase>
+    <phrase title="estpd_private_content_warning" version_id="1120" version_string="1.1.2"><![CDATA[[Доступ к данной теме ограничен списком участников]]]></phrase>
+    <phrase title="estPD_private_discussions" version_id="1120" version_string="1.1.2"><![CDATA[Приватные темы]]></phrase>
+    <phrase title="estPD_publicity_warning" version_id="1120" version_string="1.1.2"><![CDATA[Внимание! Возврат темы к публичному режиму отображения приведет к потере данных о текущих участниках темы.]]></phrase>
+    <phrase title="estPD_public_add_users" version_id="1120" version_string="1.1.2"><![CDATA[Добавить пользователей]]></phrase>
+    <phrase title="estPD_public_add_users_explain" version_id="1120" version_string="1.1.2"><![CDATA[Тут вы можете указать имена участников обсуждения, разделенные запятой.]]></phrase>
+    <phrase title="estPD_public_discussion_private" version_id="1120" version_string="1.1.2"><![CDATA[Эта тема является приватной.]]></phrase>
+    <phrase title="estPD_public_discussion_users" version_id="1120" version_string="1.1.2"><![CDATA[Участники обсуждения]]></phrase>
+    <phrase title="estPD_public_make_private" version_id="1120" version_string="1.1.2"><![CDATA[Сделать эту тему приватной]]></phrase>
+    <phrase title="estPD_public_make_private_hint" version_id="1120" version_string="1.1.2"><![CDATA[Данная опция позволяет вам сделать тему приватной. После установки приватного режима, доступ к теме будет ограничен списком указанных вами пользователей. ]]></phrase>
+    <phrase title="estPD_public_new_users" version_id="1120" version_string="1.1.2"><![CDATA[Добавить новых участников]]></phrase>
+    <phrase title="estPD_public_privacy" version_id="1120" version_string="1.1.2"><![CDATA[Приватность]]></phrase>
+    <phrase title="estPD_public_remove_recepient" version_id="1120" version_string="1.1.2"><![CDATA[Удалить {username} из этого обсуждения.]]></phrase>
+    <phrase title="estPD_recepient_access_error" version_id="1120" version_string="1.1.2"><![CDATA[У вас недостаточно прав для исключения участников из данного обсуждения.]]></phrase>
+    <phrase title="estPD_remove_user_confirm_message" version_id="1120" version_string="1.1.2"><![CDATA[Вы действительно желаете удалить {member} из списка участников обсуждения?]]></phrase>
+    <phrase title="estPD_remove_user_confirm_title" version_id="1120" version_string="1.1.2"><![CDATA[Подтверждение удаления участника]]></phrase>
+    <phrase title="estPD_statistics" version_id="1120" version_string="1.1.2"><![CDATA[Статистика]]></phrase>
+    <phrase title="estPD_submit" version_id="1120" version_string="1.1.2"><![CDATA[Отправить]]></phrase>
+    <phrase title="estpd_thread_access_settings" version_id="1120" version_string="1.1.2"><![CDATA[Установки доступа к теме]]></phrase>
+    <phrase title="estpd_thread_access_type" version_id="1120" version_string="1.1.2"><![CDATA[Тип доступа]]></phrase>
+    <phrase title="estpd_thread_limited_access_explain" version_id="1120" version_string="1.1.2"><![CDATA[Выбранный режим ограничения доступа к теме позволяет устанавливать простые правила, выполнив которые участник форума сможет получить доступ к ее содержимому. Вы можете указывать как простые ограничения: по количеству сообщений, симпатий и т. п., так и комбинированные сложные правила, позволяющие создавать более точные критерии отбора пользователей.]]></phrase>
+    <phrase title="estpd_thread_private_access_explain" version_id="1120" version_string="1.1.2"><![CDATA[Выбранный тип доступа к теме даст возможность просматривать ее содержимое только для тех пользователей, которых вы сами добавите в список участников.]]></phrase>
+    <phrase title="estpd_thread_quoting_allowed" version_id="1120" version_string="1.1.2"><![CDATA[Разрешить для любой темы и игнорировать установки узлов.]]></phrase>
+    <phrase title="estpd_thread_quoting_defined_by_node_settings" version_id="1120" version_string="1.1.2"><![CDATA[Разрешить, используя установки узлов.]]></phrase>
+    <phrase title="estpd_thread_quoting_denied" version_id="1120" version_string="1.1.2"><![CDATA[Запретить и игнорировать установки узлов.]]></phrase>
+    <phrase title="estpd_thread_type_default" version_id="1120" version_string="1.1.2"><![CDATA[Без ограничений]]></phrase>
+    <phrase title="estpd_thread_type_limited" version_id="1120" version_string="1.1.2"><![CDATA[Ограниченный доступ, определенный дополнительными правилами]]></phrase>
+    <phrase title="estpd_thread_type_private" version_id="1120" version_string="1.1.2"><![CDATA[Ограниченный доступ, определенный списком участников]]></phrase>
+    <phrase title="option_estpd_allow_quoting" version_id="1120" version_string="1.1.2"><![CDATA[Ограничение доступа к темам]]></phrase>
+    <phrase title="option_estpd_allow_quoting_explain" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="option_estPD_enabled" version_id="1120" version_string="1.1.2"><![CDATA[Активно]]></phrase>
+    <phrase title="option_estPD_enabled_explain" version_id="1120" version_string="1.1.2"><![CDATA[Активация дополнения]]></phrase>
+    <phrase title="option_group_estPD_options" version_id="1" version_string="1.0.0"><![CDATA[Esthetic Private Discussions]]></phrase>
+    <phrase title="option_group_estPD_options_description" version_id="1120" version_string="1.1.2"><![CDATA[Установки дополнения Esthetic Private Discussions.]]></phrase>
+    <phrase title="permission_forum_estpd_can_create" version_id="1120" version_string="1.1.2"><![CDATA[Создание приватных тем]]></phrase>
+    <phrase title="permission_forum_estpd_can_manage" version_id="1120" version_string="1.1.2"><![CDATA[Управление приватными и ограниченными темами]]></phrase>
+    <phrase title="permission_forum_estpd_can_set_limits" version_id="1120" version_string="1.1.2"><![CDATA[Создание ограниченных тем]]></phrase>
+    <phrase title="permission_interface_estpd" version_id="1120" version_string="1.1.2"><![CDATA[Esthetic Private Discussions]]></phrase>
+    <phrase title="style_property_estpd_access_explain_content_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estpd_access_explain_content_master" version_id="1120" version_string="1.1.2"><![CDATA[- Контент блока]]></phrase>
+    <phrase title="style_property_estpd_access_explain_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estpd_access_explain_master" version_id="1120" version_string="1.1.2"><![CDATA[Иформационный блок диалога приватности]]></phrase>
+    <phrase title="style_property_estPD_bottom_collapser_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Нижний элемент сворачивания.]]></phrase>
+    <phrase title="style_property_estPD_bottom_collapser_master" version_id="1120" version_string="1.1.2"><![CDATA[Нижний элемент сворачивания]]></phrase>
+    <phrase title="style_property_estPD_collapsed_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Стиль свернутого блока.]]></phrase>
+    <phrase title="style_property_estPD_collapsed_master" version_id="1120" version_string="1.1.2"><![CDATA[Свернутый блок]]></phrase>
+    <phrase title="style_property_estPD_info_block_content_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Стиль слоя контента панели отображения установок приватности на странице темы.]]></phrase>
+    <phrase title="style_property_estPD_info_block_content_master" version_id="1120" version_string="1.1.2"><![CDATA[Основной блок]]></phrase>
+    <phrase title="style_property_estPD_info_block_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Дополнительный контент, отображаемый дополнением.]]></phrase>
+    <phrase title="style_property_estPD_info_block_form_ctrl_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Стиль базовых элементов управления.]]></phrase>
+    <phrase title="style_property_estPD_info_block_form_ctrl_master" version_id="1120" version_string="1.1.2"><![CDATA[Элементы управления]]></phrase>
+    <phrase title="style_property_estPD_info_block_form_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Базовый стиль формы]]></phrase>
+    <phrase title="style_property_estPD_info_block_form_master" version_id="1120" version_string="1.1.2"><![CDATA[Форма добавления пользователей]]></phrase>
+    <phrase title="style_property_estPD_info_block_master" version_id="1120" version_string="1.1.2"><![CDATA[Основной блок]]></phrase>
+    <phrase title="style_property_estPD_privacy_settings_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Кнопка установок приватности]]></phrase>
+    <phrase title="style_property_estPD_privacy_settings_link_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Шрифт ссылок]]></phrase>
+    <phrase title="style_property_estPD_privacy_settings_link_hover_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estPD_privacy_settings_link_hover_master" version_id="1120" version_string="1.1.2"><![CDATA[Активная кнопка установок приватности]]></phrase>
+    <phrase title="style_property_estPD_privacy_settings_link_master" version_id="1120" version_string="1.1.2"><![CDATA[Ссылка установок приватности]]></phrase>
+    <phrase title="style_property_estPD_privacy_settings_master" version_id="1120" version_string="1.1.2"><![CDATA[Установки приватности]]></phrase>
+    <phrase title="style_property_estpd_rule_atom_match_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estpd_rule_atom_match_master" version_id="1120" version_string="1.1.2"><![CDATA[- Правило выполнено]]></phrase>
+    <phrase title="style_property_estpd_rule_atom_unmatch_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estpd_rule_atom_unmatch_master" version_id="1120" version_string="1.1.2"><![CDATA[- Правило не выполнено]]></phrase>
+    <phrase title="style_property_estpd_rule_bool_exp_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estpd_rule_bool_exp_master" version_id="1120" version_string="1.1.2"><![CDATA[- Логическая функция]]></phrase>
+    <phrase title="style_property_estpd_rule_fieldset_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estpd_rule_fieldset_master" version_id="1120" version_string="1.1.2"><![CDATA[- Группа правил]]></phrase>
+    <phrase title="style_property_estPD_thread_list_limited_item_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estPD_thread_list_limited_item_master" version_id="1120" version_string="1.1.2"><![CDATA[Ограниченные темы в списке]]></phrase>
+    <phrase title="style_property_estPD_thread_list_private_item_description_master" version_id="1" version_string="1.0.0"><![CDATA[Private items style for the thread list.]]></phrase>
+    <phrase title="style_property_estPD_thread_list_private_item_master" version_id="1120" version_string="1.1.2"><![CDATA[Приватные темы в списке]]></phrase>
+    <phrase title="style_property_estpd_thread_preview_private_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estpd_thread_preview_private_master" version_id="1120" version_string="1.1.2"><![CDATA[Предпросмотр приватной темы]]></phrase>
+    <phrase title="style_property_estPD_top_collapser_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Верхний элемент сворачивания.]]></phrase>
+    <phrase title="style_property_estPD_top_collapser_master" version_id="1120" version_string="1.1.2"><![CDATA[Верхний элемент сворачивания]]></phrase>
+    <phrase title="style_property_estPD_users_list_description_master" version_id="1120" version_string="1.1.2"><![CDATA[Список участников обсуждения.]]></phrase>
+    <phrase title="style_property_estPD_users_list_master" version_id="1120" version_string="1.1.2"><![CDATA[Участники обсуждения]]></phrase>
+    <phrase title="style_property_estPD_users_list_title_description_master" version_id="1120" version_string="1.1.2"><![CDATA[]]></phrase>
+    <phrase title="style_property_estPD_users_list_title_master" version_id="1120" version_string="1.1.2"><![CDATA[Заглавие списка участников]]></phrase>
+    <phrase title="style_property_estPD_user_thread_regular_description_master" version_id="1" version_string="1.0.0"><![CDATA[]]></phrase>
+    <phrase title="style_property_estPD_user_thread_regular_master" version_id="1120" version_string="1.1.2"><![CDATA[Участник обсуждения]]></phrase>
+    <phrase title="style_property_estPD_user_thread_starter_description_master" version_id="1" version_string="1.0.0"><![CDATA[]]></phrase>
+    <phrase title="style_property_estPD_user_thread_starter_master" version_id="1120" version_string="1.1.2"><![CDATA[Автор темы]]></phrase>
+    <phrase title="style_property_group_estPD_style_master" version_id="1120" version_string="1.1.2"><![CDATA[Стили дополнения Esthetic Private Discussion]]></phrase>
+    <phrase title="style_property_group_estPD_style_master_desc" version_id="1120" version_string="1.1.2"><![CDATA[Дополнительные стили оформления дополнения Esthetic Private Discussion.]]></phrase>
+  </phrases>
+  <route_prefixes>
+    <route_type type="public">
+      <prefix original_prefix="private-discussion" class="Esthetic_PD_Route_Prefix_Private" build_link="data_only"/>
+    </route_type>
+  </route_prefixes>
+  <style_properties>
+    <property property_name="estPD_info_block" property_type="css" definition="1" group_name="estPD_style" title="Main block" description="Additional content generated by the add-on in the thread view." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="10" sub_group=""><![CDATA[{"background-image":"@imagePath\/esthetic\/pd\/private-16x16.png","background-position":"0 2px","background-repeat":"no-repeat","extra":"position: relative;","margin-bottom":"30px","margin-top":"20px","padding-all":"0px"}]]></property>
+    <property property_name="estPD_top_collapser" property_type="css" definition="1" group_name="estPD_style" title="Top collapser" description="Top collapser for the main form." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="20" sub_group=""><![CDATA[{"background-color":"@primaryMedium","border-top-left-radius":"5px","border-top-right-radius":"5px","color":"@primaryLighterStill","extra":"text-align: center;\ncursor: pointer;\ntext-shadow: 0 1px 0 #176093;","font-size":"11px","padding-bottom":"4px","padding-top":"4px","width":"100%"}]]></property>
+    <property property_name="estPD_bottom_collapser" property_type="css" definition="1" group_name="estPD_style" title="Bottom collapser" description="Bottom collapser for the main form." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="30" sub_group=""><![CDATA[{"background-color":"@primaryMedium","border-bottom-left-radius":"5px","border-bottom-right-radius":"5px","color":"@primaryLighterStill","extra":"text-align: center;\ncursor: pointer;\ntext-shadow: 0 1px 0 #176093;","font-size":"11px","padding-bottom":"4px","padding-top":"4px","width":"100%"}]]></property>
+    <property property_name="estPD_info_block_content" property_type="css" definition="1" group_name="estPD_style" title="Main block content" description="Contents layer of the main thread view block." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="40" sub_group=""><![CDATA[{"background-color":"@primaryLightest","border-bottom-style":"none","border-color":"@primaryMedium","border-left-style":"solid","border-left-width":"1px","border-right-style":"solid","border-right-width":"1px","border-top-style":"none","padding-all":"8px"}]]></property>
+    <property property_name="estPD_users_list_title" property_type="css" definition="1" group_name="estPD_style" title="List of users title" description="List of users title tag settings." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="50" sub_group=""><![CDATA[{"background-color":"@primaryLighterStill","border-bottom-left-radius":"5px","border-bottom-style":"solid","border-bottom-width":"1px","border-color":"@primaryLightish","border-left-style":"solid","border-left-width":"1px","border-right-style":"none","border-top-left-radius":"5px","border-top-style":"solid","border-top-width":"1px","color":"@primaryDarker","extra":"position: relative;\nfloat: left;\nz-index: 1001;\ntext-shadow: 0 1px 0 #FFFFFF;","font-size":"11px","margin-top":"5px","padding-bottom":"2px","padding-left":"6px","padding-right":"6px","padding-top":"2px","width":"120px"}]]></property>
+    <property property_name="estPD_users_list" property_type="css" definition="1" group_name="estPD_style" title="List of users content" description="List's of users main content layer." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="60" sub_group=""><![CDATA[{"background-color":"@primaryLighterStill","border-color":"@primaryLightish","border-radius":"5px","border-style":"solid","border-width":"1px","color":"@primaryDarker","extra":"position: relative;\nz-index: 1000;\nmin-height: 20px;\ntext-shadow: 0 1px 0 #FFFFFF;","padding-bottom":"6px","padding-left":"8px","padding-right":"4px","padding-top":"4px","width":"auto"}]]></property>
+    <property property_name="estPD_info_block_form" property_type="css" definition="1" group_name="estPD_style" title="Add users form" description="Form basic style" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="70" sub_group=""><![CDATA[{"color":"@primaryDarker"}]]></property>
+    <property property_name="estPD_info_block_form_ctrl" property_type="css" definition="1" group_name="estPD_style" title="Add users form controlls" description="Form basic controlls style." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="80" sub_group=""><![CDATA[{"background-color":"rgb(248, 250, 255)","border-color":"@primaryLighterStill"}]]></property>
+    <property property_name="estPD_user_thread_starter" property_type="css" definition="1" group_name="estPD_style" title="Thread starter" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="90" sub_group=""><![CDATA[{"color":"@primaryLightish","font-size":"16px","font-weight":"bold"}]]></property>
+    <property property_name="estPD_user_thread_regular" property_type="css" definition="1" group_name="estPD_style" title="Thread recepient" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="100" sub_group=""><![CDATA[{"color":"@primaryMedium","extra":"line-height: 20px;","font-size":"16px"}]]></property>
+    <property property_name="estPD_collapsed" property_type="css" definition="1" group_name="estPD_style" title="Свернутый блок" description="Стиль свернутого блока." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="110" sub_group=""><![CDATA[{"background-color":"@primaryMedium","border-radius":"5px","color":"@primaryLighterStill","extra":"position: relative;\ncursor: pointer;\ntext-align: center;\ntext-shadow: 0 1px 0 #176093;","font-size":"11px","margin-bottom":"30px","margin-top":"20px","padding-bottom":"4px","padding-left":"6px","padding-right":"6px","padding-top":"4px"}]]></property>
+    <property property_name="estPD_privacy_settings" property_type="css" definition="1" group_name="estPD_style" title="Privacy settings" description="Privacy settings button style." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="120" sub_group=""><![CDATA[{"extra":"float: right;"}]]></property>
+    <property property_name="estPD_privacy_settings_link" property_type="css" definition="1" group_name="estPD_style" title="Privacy settings link" description="Link font settings." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="130" sub_group=""><![CDATA[{"background-color":"@primaryMedium","background-image":"@imagePath\/xenforo\/gradients\/navigation-tab.png","background-position":"0 -25px","background-repeat":"repeat-x","border-radius":"4px","color":"@primaryLightest","extra":"cursor: pointer;\ntext-shadow: 1px 1px 1px @primaryMedium;","font-size":"11px","padding-bottom":"4px","padding-left":"8px","padding-right":"8px","padding-top":"4px","text-decoration":{"none":"none"}}]]></property>
+    <property property_name="estPD_thread_list_private_item" property_type="css" definition="1" group_name="estPD_style" title="Thread list private items" description="Private items style for the thread list." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="160" sub_group=""><![CDATA[{"background-image":"@imagePath\/esthetic\/pd\/private-16x16.png","background-position":"0 2px","background-repeat":"no-repeat","padding-left":"24px"}]]></property>
+    <property property_name="estPD_privacy_settings_link_hover" property_type="css" definition="1" group_name="estPD_style" title="Privacy settings link active" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="135" sub_group=""><![CDATA[{"background-color":"@primaryLightish","text-decoration":{"none":"none"}}]]></property>
+    <property property_name="estpd_rule_fieldset" property_type="css" definition="1" group_name="estPD_style" title="- Rule Fieldset" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="2000" sub_group="estpd_rules"><![CDATA[{"border-color":"@primaryLight","border-radius":"4px","border-style":"solid","border-width":"1px","color":"@primaryDarker","extra":"display:inline-block;","font-size":"13px","margin-all":"4px"}]]></property>
+    <property property_name="estpd_rule_atom_match" property_type="css" definition="1" group_name="estPD_style" title="- Правило выполнено" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="2010" sub_group="estpd_rules"><![CDATA[{"background-color":"@primaryLightish","border-radius":"4px","color":"@primaryLightest","extra":"display:inline-block;","font-size":"14px","font-style":"italic","margin-all":"2px","padding-bottom":"3px","padding-left":"8px","padding-right":"8px","padding-top":"3px"}]]></property>
+    <property property_name="estpd_rule_atom_unmatch" property_type="css" definition="1" group_name="estPD_style" title="- Правило не выполнено" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="2020" sub_group="estpd_rules"><![CDATA[{"background-color":"@secondaryMedium","background-image":"@imagePath\/esthetic\/pd\/warning-16x16.png","background-position":"4px 3px","background-repeat":"no-repeat","border-radius":"4px","color":"@secondaryLightest","extra":"display:inline-block;","font-size":"14px","font-style":"italic","margin-all":"2px","padding-bottom":"3px","padding-left":"22px","padding-right":"8px","padding-top":"3px"}]]></property>
+    <property property_name="estpd_rule_bool_exp" property_type="css" definition="1" group_name="estPD_style" title="- Rule Boolean Expression" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="2030" sub_group="estpd_rules"><![CDATA[{"background-color":"@primaryDark","border-radius":"12px","color":"@primaryLightest","extra":"display:inline-block;","font-size":"13px","margin-all":"2px","padding-bottom":"0","padding-left":"4px","padding-right":"4px","padding-top":"0"}]]></property>
+    <property property_name="estpd_thread_preview_private" property_type="css" definition="1" group_name="estPD_style" title="Private Thread Preview" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="3000" sub_group=""><![CDATA[{"background-color":"@primaryLighterStill","border-radius":"4px","extra":"display:inline-block;\ntext-align:left;","margin-bottom":"50px","margin-left":"auto","margin-right":"auto","margin-top":"50px","padding-bottom":"8px","padding-left":"16px","padding-right":"16px","padding-top":"8px"}]]></property>
+    <property property_name="estPD_thread_list_limited_item" property_type="css" definition="1" group_name="estPD_style" title="Thread list limited items" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="165" sub_group=""><![CDATA[{"background-image":"@imagePath\/esthetic\/pd\/limited-16x16.png","background-position":"0 2px","background-repeat":"no-repeat","padding-left":"24px"}]]></property>
+    <property property_name="estpd_access_explain" property_type="css" definition="1" group_name="estPD_style" title="Иформационный блок диалога приватности" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="4000" sub_group=""><![CDATA[{"border-color":"@primaryLighter","border-radius":"6px","border-style":"solid","border-width":"1px","padding-all":"2px"}]]></property>
+    <property property_name="estpd_access_explain_content" property_type="css" definition="1" group_name="estPD_style" title="- Контент блока" description="" css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="4010" sub_group=""><![CDATA[{"background-color":"@primaryLightest","background-image":"@imagePath\/esthetic\/pd\/info-48x48.png","background-position":"4px 0","background-repeat":"no-repeat","border-radius":"4px","color":"@primaryMedium","extra":"min-height:48px;","padding-bottom":"4px","padding-left":"60px","padding-right":"4px","padding-top":"4px"}]]></property>
+    <group group_name="estPD_style" display_order="2368">
+      <title>Esthetic Private Discussion styles</title>
+      <description>Additional styles for the Esthetic Private Discussion add-on.</description>
+    </group>
+  </style_properties>
+  <templates>
+    <template title="estpd_access_settings_dialog" version_id="1120" version_string="1.1.2"><![CDATA[<xen:title>{xen:phrase estpd_thread_access_settings}: {$thread.title}</xen:title>
+
+<xen:navigation>
+    <xen:breadcrumb source="$node_bread_crumbs" />
+    <xen:breadcrumb href="{xen:link full:threads, $thread}">{$thread.title}</xen:breadcrumb>
+</xen:navigation>
+
+<form action="{xen:link 'private-discussion/access-dialog', $thread}" method="post" class="xenForm formOverlay" autocomplete="off">
+    
+    <xen:include template="estpd_access_settings_fields" />
+
+    <dl class="ctrlUnit submitUnit">
+        <dt></dt>
+        <dd>
+            <input type="submit" value="{xen:phrase save}" accesskey="s" class="button primary" />
+        </dd>
+    </dl>
+    <input type="hidden" name="thread_id" value="{$thread.thread_id}" />
+    <input type="hidden" name="confirm" value="1" />
+    <input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>
+]]></template>
+    <template title="estpd_access_settings_fields" version_id="1120" version_string="1.1.2"><![CDATA[<xen:if is="{$is_creation_form}">
+    <h3 class="textHeading">{xen:phrase estPD_public_privacy}</h3>
+</xen:if>
+
+<dl class="ctrlUnit">
+    <dt>{xen:phrase estpd_thread_access_type}:</dt>
+    <dd>
+        <ul>
+            <li>
+                <label for="ctrl_thread_type_default">
+                    <input type="radio" name="thread_type" id="ctrl_thread_type_default" value="0" {xen:checked '!{$is_private} && !{$is_limited}'} />
+                    {xen:phrase estpd_thread_type_default}
+                </label>
+            </li>
+            
+            <xen:if is="{$can_set_limited}">
+                <li>
+                    <label for="ctrl_thread_type_limited">
+                        <input type="radio" name="thread_type" id="ctrl_thread_type_limited" value="1" {xen:checked '{$is_limited}'} />
+                        {xen:phrase estpd_thread_type_limited}
+                    </label>
+                </li>
+            </xen:if>
+            
+            <xen:if is="{$can_set_private}">
+                <li>
+                    <label for="ctrl_thread_type_private">
+                        <input type="radio" name="thread_type" id="ctrl_thread_type_private" value="2" {xen:checked '{$is_private}'} />
+                        {xen:phrase estpd_thread_type_private}
+                    </label>
+                </li>
+            </xen:if>
+        </ul>
+    </dd>
+</dl>
+
+<div class="estpd-ctrl-private-unit" style="display:{xen:if $is_private, 'block', 'none'};">
+    <div class="estpd-access-explain">
+        <div class="estpd-access-explain-content">{xen:phrase estpd_thread_private_access_explain}</div>
+    </div>
+    <dl class="ctrlUnit">
+        <dt></dt>
+        <dd>
+            <label for="ctrl_estPD_allow_public_invitation">
+                <input id="ctrl_estPD_allow_public_invitation" type="checkbox" value="1" name="estpd_allow_public_invitation" {xen:checked '{$thread.estpd_allow_invitation}'} />
+                {xen:phrase estPD_allow_public_invitation}
+            </label>
+            <p class="explain">{xen:phrase estPD_allow_public_invitation_hint}</p>
+            
+            <xen:if is="{$thread.is_estpd}">
+                <p class="explain">{xen:phrase estPD_publicity_warning}</p>
+            </xen:if>
+        </dd>
+    </dl>
+</div>
+
+<div class="estpd-ctrl-limited-unit" style="display:{xen:if $is_limited, 'block', 'none'};">
+    <div class="estpd-access-explain">
+        <div class="estpd-access-explain-content">{xen:phrase estpd_thread_limited_access_explain}</div>
+    </div>
+    
+    <dl class="ctrlUnit">
+        <dt><label for="estpd_limit_posts">{xen:phrase estpd_limit_posts}:</label></dt>
+        <dd>
+            <input type="text" name="posts" value="{xen:number $limits.posts}" id="estpd_limit_posts" class="textCtrl" size="12" />
+        </dd>
+    </dl>
+    
+    <dl class="ctrlUnit">
+        <dt><label for="estpd_limit_likes">{xen:phrase estpd_limit_likes}:</label></dt>
+        <dd>
+            <input type="text" name="likes" value="{xen:number $limits.likes}" id="estpd_limit_likes" class="textCtrl" size="12" />
+        </dd>
+    </dl>
+    
+    <dl class="ctrlUnit">
+        <dt><label for="estpd_limit_trophies">{xen:phrase estpd_limit_trophies}:</label></dt>
+        <dd>
+            <input type="text" name="trophies" value="{xen:number $limits.trophies}" id="estpd_limit_trophies" class="textCtrl" size="12" />
+        </dd>
+    </dl>
+    
+    <dl class="ctrlUnit">
+        <dt><label for="estpd_limit_days">{xen:phrase estpd_limit_days}:</label></dt>
+        <dd>
+            <input type="text" name="days" value="{xen:number $limits.days}" id="estpd_limit_days" class="textCtrl" size="12" />
+        </dd>
+    </dl>
+    
+    <dl class="ctrlUnit">
+        <dt><label for="estpd_limit_extended_rules">{xen:phrase estpd_limit_extended_rules}:</label></dt>
+        <dd>
+            <textarea type="text" name="extended" id="estpd_limit_extended_rules" class="textCtrl" rows="3">{$limits.extended}</textarea>
+        </dd>
+    </dl>
+</div>
+
+<xen:require js="js/esthetic/pd/thread_ctrl_dialog.js" />]]></template>
+    <template title="estpd_limits_form_styles.css" version_id="1120" version_string="1.1.2"><![CDATA[/* ***** Limits Form Styles ***** */
+
+.estpd-rule-fieldset {
+    {xen:property estpd_rule_fieldset}
+}
+.estpd-rule-atom-matched {
+    {xen:property estpd_rule_atom_match}
+}
+.estpd-rule-atom-unmatched {
+    {xen:property estpd_rule_atom_unmatch}
+}
+.estpd-rule-bool-expression,
+.estpd-rule-atom-unmatched .estpd-rule-bool-expression,
+.estpd-rule-atom-matched .estpd-rule-bool-expression {
+    {xen:property estpd_rule_bool_exp}
+}]]></template>
+    <template title="estPD_private_personal" version_id="110" version_string="1.1.0"><![CDATA[<xen:title>{xen:phrase estPD_personal_private_discussions}</xen:title>
+<xen:require css="discussion_list.css" />
+<xen:require css="estPD_private_personal.css" />
+
+<div class="discussionList section sectionMain">
+    <form class="DiscussionList InlineModForm">
+        <dl class="sectionHeaders">
+            <dt class="posterAvatar"> </dt>
+            <dd class="main">
+                <p><span>{xen:phrase title}</span></p>
+            </dd>
+            <dd class="stats">
+                <p><span>{xen:phrase estPD_statistics}</span></p>
+            </dd>
+            <dd class="lastPost">
+                <p><span>{xen:phrase last_message}</span></p>
+            </dd>
+        </dl>
+    
+        <ol class="discussionListItems">
+        <xen:if is="{$threads}">
+            <xen:hook name="thread_list_threads">
+                <xen:foreach loop="$threads" value="$thread">
+                    <xen:include template="thread_list_item" />
+                </xen:foreach>
+            </xen:hook>
+        <xen:else />
+            <li class="primaryContent">{xen:phrase there_no_threads_to_display}</li>
+        </xen:if>
+        </ol>
+    </form>
+</div>
+]]></template>
+    <template title="estPD_private_personal.css" version_id="110" version_string="1.1.0"><![CDATA[.discussionList .sectionHeaders p span {
+    display: block;
+    padding: 5px 10px;
+}]]></template>
+    <template title="estPD_remove_user_confirm" version_id="1120" version_string="1.1.2"><![CDATA[<xen:title>{xen:phrase estPD_remove_user_confirm_title}</xen:title>
+
+<xen:navigation>
+    <xen:breadcrumb source="$nodeBreadCrumbs" />
+    <xen:breadcrumb href="{xen:link full:threads, $thread}">{$thread.title}</xen:breadcrumb>
+</xen:navigation>
+
+<form action="{xen:link 'private-discussion/remove-user', $thread}" method="post" class="xenForm formOverlay">
+    <dl class="ctrlUnit">
+        <dt>
+            <xen:avatar user="$recepient" size="s" />
+        </dt>
+        <dd>
+            {xen:phrase estPD_remove_user_confirm_message, 'member={$recepient.username}'}
+        </dd>
+    </dl>
+    <dl class="ctrlUnit submitUnit">
+        <dt></dt>
+        <dd>
+            <input type="submit" value="{xen:phrase estPD_confirm}" accesskey="s" class="button primary" />
+        </dd>
+    </dl>
+    <input type="hidden" name="user_id" value="{$recepient.user_id}" />
+    <input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="estpd_thread_access_limit" version_id="1120" version_string="1.1.2"><![CDATA[<xen:require css="estpd_thread_access_limit.css" />
+
+<xen:title>{$thread.title}{xen:helper pagenumber, $page}</xen:title>
+<xen:h1>{$thread.title}</xen:h1>
+
+<xen:description>
+	{xen:phrase discussion_in_x_started_by_y_date_z,
+		'forum=<a href="{xen:link forums, $forum}">{$forum.title}</a>',
+		'name={xen:helper username, $thread}',
+		'date=<a href="{xen:link threads, $thread}">{xen:datetime $thread.post_date, html}</a>'}
+</xen:description>
+
+<xen:navigation>
+	<xen:breadcrumb source="$nodeBreadCrumbs" />
+</xen:navigation>
+
+<xen:if is="{$thread.estpd_thread_type} == 2">
+    <xen:require css="estpd_thread_top_content.css" />
+    <div class="estpd-access-limit-explain">
+        <div class="estpd-access-limit-content">
+            <h1>{xen:phrase estpd_limited_thread_explain}</h1>
+            <div class="estpd-access-rule">{xen:raw $message}</div>
+        </div>
+    </div>
+<xen:else />
+    <div class="estpd-access-limit-explain">
+        <div class="estpd-access-limit-content">{xen:phrase estpd_access_limit_explain, 'link={xen:link members, $author}', 'username={$author.username}'}</div>
+    </div>
+</xen:if>]]></template>
+    <template title="estpd_thread_access_limit.css" version_id="1120" version_string="1.1.2"><![CDATA[.estpd-access-limit-explain {
+    text-align:center;
+    clear:both;
+    display:block;
+}
+
+    .estpd-access-limit-explain .estpd-access-limit-content {
+        {xen:property estpd_thread_preview_private}
+    }
+    
+    .previewContent .estpd-access-limit-explain .estpd-access-limit-content {
+        margin:4px;
+    }
+    
+    .estpd-access-limit-explain .estpd-access-limit-content h1 {
+        text-align:left;
+        margin-bottom:4px;
+        text-shadow: 0 0 0 transparent, 0 1px 0 #ffffff;
+        color:{xen:property primaryMedium};
+        font-size:16px;
+    }
+    
+        .previewContent .estpd-access-limit-explain .estpd-access-limit-content .estpd-access-rule {
+            max-height:240px;
+            overflow-y:auto;
+        }
+        
+.estpd-access-explain {
+    {xen:property estpd_access_explain}
+}
+
+    .estpd-access-explain .estpd-access-explain-content {
+        {xen:property estpd_access_explain_content}
+    }]]></template>
+    <template title="estPD_thread_list" version_id="1" version_string="1.0.0"><![CDATA[<xen:require css="estPD_thread_list.css" />]]></template>
+    <template title="estPD_thread_list.css" version_id="1120" version_string="1.1.2"><![CDATA[.estpd-thread-private .listBlock .titleText .title {
+    {xen:property estPD_thread_list_private_item}
+}
+
+.estpd-thread-limited .listBlock .titleText .title {
+    {xen:property estPD_thread_list_limited_item}
+}]]></template>
+    <template title="estpd_thread_top_content" version_id="1120" version_string="1.1.2"><![CDATA[<xen:require css="estpd_thread_top_content.css" />
+<xen:require css="estpd_limits_form_styles.css" />
+
+<xen:if is="{$estpd.can_manage_privacy} || {$estpd.can_manage_limits}">
+    <div class="estPD_privacy_settings">
+        <a class="OverlayTrigger" href="{xen:link 'private-discussion/access-dialog', $thread}">{xen:phrase estpd_access_settings_ctrl}</a>
+    </div>
+    <div class="estPD_cleaner"></div>
+</xen:if>
+
+<xen:if is="{$estpd.is_private}">
+    <div id="estPD-thread-{$thread.thread_id}-expanded" class="estPD_info_block"  style="display:block;">
+        <div class="estPD_top_collapser estPD_collapser">{xen:phrase estPD_form_collapse}</div>
+        <div class="estPD_info_block_content">
+            <h1>{xen:phrase estPD_public_discussion_users}</h1>
+            <div class="estPD_users_list">
+                <xen:foreach loop="$estpd.recepients" key="$index" value="$user">
+                    <nobr><a href="{xen:link 'members/', $user}" class="username {xen:if "{$user.is_ts}", 'estPD_user_starter', 'estPD_user_regular'}">
+                    {$user.username}</a><xen:if is="{$estpd.can_manage_privacy} && !{$user.is_ts}"><a href="{xen:link 'private-discussion/remove-confirmation', $thread, 'user_id={$user.user_id}'}" title="{xen:phrase estPD_public_remove_recepient, 'username={$user.username}'}" class="OverlayTrigger Tooltip estpd-user-list-ctrl" data-offsetX="-8"></a></xen:if>{xen:if "{$index} == {$estpd.recepients_count}", ';', ', '}</nobr>
+                </xen:foreach>
+            </div>
+            <div class="estPD_cleaner"></div>
+            <xen:if is="{$estpd.can_add_users}">
+                <form class="xenForm" method="post" action="{xen:link 'private-discussion/add', $thread}">
+                    <dl class="ctrlUnit">
+                        <dt>{xen:phrase estPD_public_add_users}:</dt>
+                        <dd>
+                            <textarea id="ctrl_estPD_users" class="textCtrl Elastic AutoComplete" rows="2" name="estPD_users" autocomplete="off"></textarea>
+                            <p class="explain">{xen:phrase estPD_public_add_users_explain}</p>
+                        </dd>
+                    </dl>
+                    <dl class="ctrlUnit submitUnit">
+                        <dt></dt>
+                        <dd><input type="submit" name="submit" value="{xen:phrase estPD_submit}" accesskey="s" class="button primary" /></dd>
+                    </dl>
+                    <input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+                </form>
+            </xen:if>
+        </div>
+        <div class="estPD_bottom_collapser estPD_collapser">{xen:phrase estPD_form_collapse}</div>
+    </div>
+    <div id="estPD-thread-{$thread.thread_id}-collapsed" class="estPD_info_block_collapsed" style="display:none;">{xen:phrase estPD_form_expand}</div>
+    <xen:require js="js/esthetic/pd/thread_top_content_ctrl.js" />
+<xen:elseif is="{$estpd.is_limited}" />
+    <div id="estPD-thread-{$thread.thread_id}-expanded" class="estPD_info_block"  style="display:block;">
+        <div class="estPD_top_collapser estPD_collapser">{xen:phrase estPD_form_collapse}</div>
+        <div class="estPD_info_block_content">
+            <xen:if is="{$estpd.limits.is_error}">
+                <div class="estpd-rule-atom-unmatched">{xen:phrase estpd_limitation_rule_syntax_error}</div>
+            <xen:else />
+                {xen:raw $estpd.limits.message}
+            </xen:if>
+        </div>
+        <div class="estPD_bottom_collapser estPD_collapser">{xen:phrase estPD_form_collapse}</div>
+    </div>
+    <div id="estPD-thread-{$thread.thread_id}-collapsed" class="estPD_info_block_collapsed" style="display:none;">{xen:phrase estPD_form_expand}</div>    
+    <xen:require js="js/esthetic/pd/thread_top_content_ctrl.js" />
+</xen:if>
+
+<script type="text/javascript">
+var thread_id = {$thread.thread_id};
+</script>]]></template>
+    <template title="estpd_thread_top_content.css" version_id="1120" version_string="1.1.2"><![CDATA[.estPD_cleaner {
+    position:relative;
+    width:100%;
+    height:1px;
+    clear:both;
+}
+
+.estPD_info_block {
+    {xen:property estPD_info_block}
+}
+
+    .estPD_info_block .estPD_top_collapser {
+        {xen:property estPD_top_collapser}
+    }
+    
+    .estPD_info_block .estPD_bottom_collapser {
+        {xen:property estPD_bottom_collapser}
+    }
+    
+    .estPD_info_block .estPD_info_block_content {
+        {xen:property estPD_info_block_content}
+    }
+
+        .estPD_info_block .estPD_info_block_content h1 {
+            {xen:property estPD_users_list_title}
+        }
+        
+        .estPD_info_block .estPD_info_block_content .estPD_users_list {
+            {xen:property estPD_users_list}
+            margin-left: {xen:calc '{xen:property estPD_users_list_title.width} + {xen:property estPD_users_list_title.padding-left} + {xen:property estPD_users_list_title.padding-right}'}px;
+        }
+    
+        .estPD_info_block .estPD_info_block_content .xenForm {
+            {xen:property estPD_info_block_form}
+        }
+        
+            .estPD_info_block .estPD_info_block_content .xenForm .textCtrl {
+                {xen:property estPD_info_block_form_ctrl}
+            }
+            
+            .estPD_info_block .estPD_info_block_content .xenForm .submitUnit {
+                border-color: {xen:property estPD_info_block_form_ctrl.border-color};
+            }
+
+        .estPD_info_block .estPD_info_block_content .estPD_users_list .estPD_user_regular {
+            {xen:property estPD_user_thread_regular}
+        }
+        
+        .estPD_info_block .estPD_info_block_content .estPD_users_list .estPD_user_starter,
+        .estPD_info_block .estPD_info_block_content .estPD_users_list .OverlayTrigger {
+            {xen:property estPD_user_thread_starter}
+        }
+        
+.estPD_info_block_collapsed {
+    {xen:property estPD_collapsed}
+}
+
+.estPD_privacy_settings {
+    {xen:property estPD_privacy_settings}
+}
+
+    .estPD_privacy_settings .OverlayTrigger {
+        {xen:property estPD_privacy_settings_link}
+    }
+    .estPD_privacy_settings .OverlayTrigger:hover, .estPD_privacy_settings .OverlayTrigger:focus {
+        {xen:property estPD_privacy_settings_link_hover}
+    }
+    
+.estpd-user-list-ctrl {
+    display:inline-block;
+    height:16px;
+    width:16px;
+    background:transparent url('{xen:property imagePath}/esthetic/pd/delete-user-16x32.png') 0 -16px no-repeat;
+}
+
+.estpd-user-list-ctrl:hover,
+.estpd-user-list-ctrl:focus {
+    background:transparent url('{xen:property imagePath}/esthetic/pd/delete-user-16x32.png') 0 0 no-repeat;
+}
+]]></template>
+  </templates>
+  <public_template_modifications>
+    <modification template="thread_list" modification_key="estPD_thread_list" description="Включение шаблона стилей" execution_order="236800" enabled="1" action="str_replace">
+      <find><![CDATA[<xen:require css="discussion_list.css" />]]></find>
+      <replace><![CDATA[$0
+<xen:require css="estPD_thread_list.css" />]]></replace>
+    </modification>
+    <modification template="thread_list_item" modification_key="estPD_thread_list_item" description="Маркировка приватных тем" execution_order="236800" enabled="1" action="str_replace">
+      <find><![CDATA[<li id="thread-{$thread.thread_id}" class="]]></find>
+      <replace><![CDATA[<xen:if is="{$thread.estpd_thread_type} == 2">
+    <xen:set var="$estpd_thread_class">estpd-thread-limited</xen:set>
+<xen:elseif is="{$thread.estpd_thread_type} == 1" />
+    <xen:set var="$estpd_thread_class">estpd-thread-private</xen:set>
+<xen:else />
+    <xen:set var="$estpd_thread_class">test</xen:set>
+</xen:if>
+
+$0{xen:if $estpd_thread_class, '{$estpd_thread_class} ', ''}]]></replace>
+    </modification>
+    <modification template="PAGE_CONTAINER" modification_key="estpd_forum_view" description="" execution_order="236800" enabled="1" action="str_replace">
+      <find><![CDATA[<xen:hook name="body">]]></find>
+      <replace><![CDATA[<xen:require css="estpd_thread_access_limit.css" />
+<xen:require css="estpd_limits_form_styles.css" />
+$0]]></replace>
+    </modification>
+    <modification template="thread_view" modification_key="estpd_thread_view" description="" execution_order="236800" enabled="1" action="str_replace">
+      <find><![CDATA[<xen:include template="ad_thread_view_above_messages" />]]></find>
+      <replace><![CDATA[<xen:include template="estpd_thread_top_content" />
+$0]]></replace>
+    </modification>
+  </public_template_modifications>
+  <bb_code_media_sites/>
+  <bb_codes/>
+</addon>
